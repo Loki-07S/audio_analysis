@@ -25,11 +25,35 @@ def health_check():
     except ImportError:
         gpu_available = False
     
+    # Test basic imports
+    try:
+        import whisper
+        whisper_available = True
+    except ImportError:
+        whisper_available = False
+    
+    try:
+        import numpy
+        numpy_available = True
+    except ImportError:
+        numpy_available = False
+    
+    try:
+        from textblob import TextBlob
+        textblob_available = True
+    except ImportError:
+        textblob_available = False
+    
     return jsonify({
         "status": "healthy",
         "message": "Audio Analysis API is running",
         "gpu_available": gpu_available,
-        "platform": "Hugging Face Spaces"
+        "platform": "Render",
+        "dependencies": {
+            "whisper": whisper_available,
+            "numpy": numpy_available,
+            "textblob": textblob_available
+        }
     })
 
 @app.route('/speaking', methods=['POST'])
@@ -44,17 +68,22 @@ def speaking_analysis():
     - JSON with fluency, grammar, and professionalism analysis
     """
     try:
+        print("Speaking analysis endpoint called")
+        
         # Check if audio file is present
         if 'audio' not in request.files:
+            print("No audio file in request")
             return jsonify({
                 "error": "No audio file provided",
                 "message": "Please upload an audio file using the 'audio' field"
             }), 400
         
         audio_file = request.files['audio']
+        print(f"Audio file received: {audio_file.filename}")
         
         # Check if file is selected
         if audio_file.filename == '':
+            print("No file selected")
             return jsonify({
                 "error": "No file selected",
                 "message": "Please select an audio file to upload"
@@ -62,6 +91,7 @@ def speaking_analysis():
         
         # Check file extension
         if not allowed_file(audio_file.filename):
+            print(f"Invalid file type: {audio_file.filename}")
             return jsonify({
                 "error": "Invalid file type",
                 "message": f"Allowed file types: {', '.join(ALLOWED_EXTENSIONS)}"
@@ -70,22 +100,36 @@ def speaking_analysis():
         # Save the uploaded file temporarily
         filename = secure_filename(audio_file.filename)
         temp_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        print(f"Saving file to: {temp_path}")
         audio_file.save(temp_path)
         
         try:
+            print("Starting audio analysis...")
             # Analyze audio only (speaking assessment)
             result = analyze_audio(temp_path)
+            print("Audio analysis completed successfully")
             return jsonify(result)
+            
+        except Exception as analysis_error:
+            print(f"Audio analysis failed: {str(analysis_error)}")
+            return jsonify({
+                "error": "Audio analysis failed",
+                "message": str(analysis_error),
+                "details": "Check if all dependencies are properly installed"
+            }), 500
             
         finally:
             # Clean up temporary file
             if os.path.exists(temp_path):
                 os.remove(temp_path)
+                print(f"Temporary file removed: {temp_path}")
                 
     except Exception as e:
+        print(f"Speaking analysis endpoint error: {str(e)}")
         return jsonify({
             "error": "Analysis failed",
-            "message": str(e)
+            "message": str(e),
+            "type": "endpoint_error"
         }), 500
 
 @app.route('/listening', methods=['POST'])
@@ -224,7 +268,8 @@ def index():
         "platform": "Render",
         "endpoints": {
             "GET /": "API documentation (this endpoint)",
-            "GET /health": "Health check",
+            "GET /health": "Health check with dependency status",
+            "GET /test": "Simple test endpoint",
             "POST /speaking": "Speaking analysis - audio only (fluency, grammar, professionalism)",
             "POST /listening": "Listening analysis - audio + text (similarity, fluency, grammar)",
             "POST /analyze-text": "Text analysis only (grammar and professionalism)"
@@ -236,6 +281,21 @@ def index():
         },
         "supported_audio_formats": list(ALLOWED_EXTENSIONS)
     })
+
+@app.route('/test', methods=['GET'])
+def test_endpoint():
+    """Simple test endpoint to check basic functionality"""
+    try:
+        return jsonify({
+            "status": "success",
+            "message": "Test endpoint working",
+            "timestamp": time.time()
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 if __name__ == '__main__':
     # Use port from environment variable (Render uses 10000)

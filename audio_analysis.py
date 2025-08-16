@@ -9,18 +9,48 @@ import torch
 from textblob import TextBlob
 import re
 import string
+import gc
 
+# GPU memory management for Hugging Face Spaces
 if torch.cuda.is_available():
     print("CUDA is available. GPU will be used for inference.")
     print(f"GPU Name: {torch.cuda.get_device_name(0)}")
+    print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+    
+    # Set memory fraction to avoid OOM errors
+    torch.cuda.set_per_process_memory_fraction(0.8)
 else:
     print("CUDA is NOT available. Running on CPU.")
 
 def transcribe_audio(audio_path):
-    """Transcribe audio using whisper (not included in final output)"""
-    model = whisper.load_model("tiny")
-    result = model.transcribe(audio_path)
-    return result['text']
+    """Transcribe audio using whisper (optimized for HF Spaces)"""
+    try:
+        # Use tiny model for faster inference and less memory usage
+        model = whisper.load_model("tiny")
+        
+        # Move model to GPU if available
+        if torch.cuda.is_available():
+            model = model.cuda()
+        
+        result = model.transcribe(audio_path)
+        
+        # Clean up GPU memory
+        if torch.cuda.is_available():
+            del model
+            torch.cuda.empty_cache()
+            gc.collect()
+        
+        return result['text']
+    except Exception as e:
+        print(f"Transcription error: {e}")
+        # Fallback to CPU if GPU fails
+        try:
+            model = whisper.load_model("tiny")
+            result = model.transcribe(audio_path)
+            return result['text']
+        except Exception as e2:
+            print(f"CPU fallback also failed: {e2}")
+            return ""
 
 def _normalize_text_for_compare(text: str) -> list:
     text = text.lower()

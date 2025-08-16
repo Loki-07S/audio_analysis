@@ -1,4 +1,4 @@
-# Core dependencies for audio analysis
+# Core dependencies for audio analysis (optimized for HF Spaces)
 openai-whisper>=20231117
 numpy>=1.21.0
 language-tool-python>=2.7.1
@@ -17,3 +17,6 @@ werkzeug>=2.0.0
 
 # Hugging Face Spaces dependencies
 gradio>=3.50.0
+
+# GPU optimization
+torchaudio>=0.9.0

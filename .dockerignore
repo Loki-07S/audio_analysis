@@ -24,39 +24,28 @@ coverage.xml
 .pytest_cache
 .hypothesis
 
-# Virtual environments
-venv/
-ENV/
-env/
-.venv/
+# Documentation
+README.md
+README_HF.md
+*.md
 
 # IDE
-.vscode/
-.idea/
+.vscode
+.idea
 *.swp
 *.swo
 
 # OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Project specific
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Test files
 test_*.py
 *_test.py
-README.md
-TROUBLESHOOTING.md
-candidate_report.txt
-DEPLOYMENT.md
-deploy.sh
-railway.json
-render.yaml
-install_dependencies.py
-
-# Documentation and guides
-*.md
-!requirements.txt
+tests/

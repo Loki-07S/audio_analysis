@@ -175,13 +175,8 @@ title: Audio Analyzer
 emoji: 🎶
 colorFrom: blue
 colorTo: purple
-sdk: gradio
+sdk: docker
 sdk_version: 4.0.0
 app_file: app.py
 pinned: false
 ---
-
-# 🎵 Audio Analyzer
-
-This Space analyzes audio files using machine learning.  
-Built with **Gradio** on Hugging Face Spaces 🚀.

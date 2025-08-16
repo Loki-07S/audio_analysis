@@ -1,6 +1,6 @@
 import whisper
 import numpy as np
-import language_tool_python
+# import language_tool_python  # Removed - requires Java
 from pydub import AudioSegment
 import os
 import time
@@ -469,61 +469,64 @@ def analyze_fluency_advanced_audio(fluency_stats):
     }
 
 def analyze_grammar_advanced(text):
-    """Advanced grammar analysis using multiple tools"""
-    tool = language_tool_python.LanguageTool('en-US')
-    matches = tool.check(text)
-    
-    # TextBlob for additional analysis
+    """Advanced grammar analysis using TextBlob (Java-free alternative)"""
+    # TextBlob for grammar analysis
     blob = TextBlob(text)
     
-    grammar_score = 100  # Start with 100 instead of 50
+    grammar_score = 100  # Start with 100
     grammar_analysis = []
     
-    # Error count analysis - More lenient
-    num_errors = len(matches)
-    if num_errors == 0:
-        grammar_analysis.append("Excellent grammar - no errors detected")
-    elif num_errors <= 3:  # Increased from 2
-        grammar_score -= 6  # Reduced penalty (doubled from 3)
-        grammar_analysis.append("Good grammar with minor errors")
-    elif num_errors <= 6:  # Increased from 5
-        grammar_score -= 12  # Reduced penalty (doubled from 6)
-        grammar_analysis.append("Moderate grammar issues")
-    elif num_errors <= 12:  # Increased from 10
-        grammar_score -= 24  # Reduced penalty (doubled from 12)
-        grammar_analysis.append("Significant grammar problems")
-    else:
-        grammar_score -= 40  # Reduced penalty (doubled from 20)
-        grammar_analysis.append("Major grammar issues need attention")
+    # Basic grammar checks using TextBlob
+    # Note: TextBlob provides basic grammar checking without Java dependency
     
     # Sentence structure analysis
     sentences = blob.sentences
     avg_sentence_length = np.mean([len(s.words) for s in sentences]) if sentences else 0
     
-    if 8 <= avg_sentence_length <= 25:  # Expanded from 10-20
+    if 8 <= avg_sentence_length <= 25:
         grammar_analysis.append("Good sentence structure and variety")
     elif avg_sentence_length < 8:
         grammar_analysis.append("Sentences are too short - consider combining ideas")
+        grammar_score -= 5
     else:
         grammar_analysis.append("Sentences are quite long - consider breaking them up")
+        grammar_score -= 5
     
-    # Specific error types
-    error_types = {}
-    for match in matches:
-        error_type = match.ruleId
-        if error_type not in error_types:
-            error_types[error_type] = 0
-        error_types[error_type] += 1
+    # Word count analysis
+    words = text.split()
+    if len(words) < 10:
+        grammar_analysis.append("Text is very short - consider adding more content")
+        grammar_score -= 10
+    elif len(words) > 500:
+        grammar_analysis.append("Text is very long - consider breaking into sections")
+        grammar_score -= 5
     
-    if error_types:
-        most_common_error = max(error_types, key=error_types.get)
-        grammar_analysis.append(f"Most common error: {most_common_error}")
+    # Punctuation check
+    if text.count('.') < text.count('!') + text.count('?'):
+        grammar_analysis.append("Good use of varied punctuation")
+    else:
+        grammar_analysis.append("Consider using more varied punctuation")
+    
+    # Capitalization check
+    if text[0].isupper() and text.count('.') > 0:
+        grammar_analysis.append("Proper sentence capitalization")
+    else:
+        grammar_analysis.append("Check sentence capitalization")
+        grammar_score -= 5
+    
+    # Basic spelling check (TextBlob has limited spelling correction)
+    corrected_text = str(blob.correct())
+    if corrected_text != text:
+        grammar_analysis.append("Some spelling issues detected")
+        grammar_score -= 10
+    else:
+        grammar_analysis.append("No obvious spelling issues detected")
     
     return {
-        "score": grammar_score,
+        "score": max(0, grammar_score),  # Ensure score doesn't go below 0
         "analysis": grammar_analysis,
-        "errors": [match.message for match in matches],
-        "error_count": num_errors
+        "errors": ["Grammar analysis using TextBlob (limited compared to LanguageTool)"],
+        "error_count": 0  # TextBlob doesn't provide specific error counts
     }
 
 def analyze_professionalism(text):

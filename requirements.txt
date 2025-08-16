@@ -1,7 +1,7 @@
-# Core dependencies for audio analysis (optimized for HF Spaces)
+# Core dependencies for audio analysis (optimized for Render)
 openai-whisper>=20231117
 numpy>=1.21.0
-language-tool-python>=2.7.1
+# language-tool-python>=2.7.1  # Removed - requires Java
 pydub>=0.25.1
 torch>=1.9.0
 textblob>=0.17.1

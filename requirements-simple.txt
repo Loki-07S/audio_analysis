@@ -1,4 +1,4 @@
-# Minimal dependencies for deployment
+# Simple requirements for deployment
 openai-whisper==20231117
 numpy==1.24.3
 language-tool-python==2.7.1

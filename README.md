@@ -170,3 +170,18 @@ This API is deployed on Hugging Face Spaces with:
 - **Auto-scaling**: Handles traffic spikes
 - **Global CDN**: Fast response times worldwide
 - **SSL Security**: HTTPS encryption
+---
+title: Audio Analyzer
+emoji: 🎶
+colorFrom: blue
+colorTo: purple
+sdk: gradio
+sdk_version: 4.0.0
+app_file: app.py
+pinned: false
+---
+
+# 🎵 Audio Analyzer
+
+This Space analyzes audio files using machine learning.  
+Built with **Gradio** on Hugging Face Spaces 🚀.

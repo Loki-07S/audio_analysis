@@ -1,6 +1,5 @@
 # Core dependencies for audio analysis
 openai-whisper>=20231117
-parselmouth>=0.4.3
 numpy>=1.21.0
 language-tool-python>=2.7.1
 pydub>=0.25.1

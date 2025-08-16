@@ -8,7 +8,7 @@ import json
 import sys
 import os
 
-def test_health_check(base_url):
+def test_health_check(base_url, audio_file=None):
     """Test the health check endpoint"""
     print("🔍 Testing health check...")
     try:
@@ -26,7 +26,7 @@ def test_health_check(base_url):
         print(f"❌ Health check error: {e}")
         return False
 
-def test_api_documentation(base_url):
+def test_api_documentation(base_url, audio_file=None):
     """Test the API documentation endpoint"""
     print("\n📚 Testing API documentation...")
     try:
@@ -102,7 +102,7 @@ def test_listening_endpoint(base_url, audio_file=None):
         print(f"❌ Listening analysis error: {e}")
         return False
 
-def test_text_analysis_endpoint(base_url):
+def test_text_analysis_endpoint(base_url, audio_file=None):
     """Test the text-only analysis endpoint"""
     print("\n📝 Testing text analysis endpoint...")
     
@@ -130,7 +130,7 @@ def main():
     """Main test function"""
     if len(sys.argv) < 2:
         print("Usage: python test_deployment.py <base_url> [audio_file]")
-        print("Example: python test_deployment.py https://your-app.railway.app test.mp3")
+        print("Example: python test_deployment.py https://your-app.onrender.com test.mp3")
         sys.exit(1)
     
     base_url = sys.argv[1].rstrip('/')

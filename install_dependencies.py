@@ -44,20 +44,21 @@ def install_torch():
     # Fallback to regular torch
     return run_command(f"{sys.executable} -m pip install torch", "Installing PyTorch (fallback)")
 
+# Core dependencies
+CORE_DEPS = [
+    "openai-whisper>=20231117",
+    "numpy>=1.21.0",
+    "language-tool-python>=2.7.1",
+    "pydub>=0.25.1",
+    "torch>=1.9.0",
+    "textblob>=0.17.1",
+]
+
 def install_core_dependencies():
-    """Install core dependencies"""
-    dependencies = [
-        "numpy>=1.21.0",
-        "pandas>=1.3.0",
-        "pytz>=2020.1",
-        "textblob>=0.17.1",
-        "pydub>=0.25.1"
-    ]
-    
-    for dep in dependencies:
-        if not run_command(f"{sys.executable} -m pip install {dep}", f"Installing {dep}"):
-            return False
-    return True
+    """Install core dependencies for audio analysis"""
+    print("Installing core dependencies...")
+    for dep in CORE_DEPS:
+        run_command(f"{sys.executable} -m pip install {dep}", f"Installing {dep}")
 
 def install_audio_dependencies():
     """Install audio processing dependencies"""

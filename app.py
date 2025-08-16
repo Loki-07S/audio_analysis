@@ -221,7 +221,7 @@ def index():
     return jsonify({
         "message": "Audio Analysis API",
         "version": "1.0.0",
-        "platform": "Hugging Face Spaces",
+        "platform": "Render",
         "endpoints": {
             "GET /": "API documentation (this endpoint)",
             "GET /health": "Health check",
@@ -238,6 +238,6 @@ def index():
     })
 
 if __name__ == '__main__':
-    # Use port 7860 for Hugging Face Spaces
-    port = int(os.environ.get('PORT', 7860))
+    # Use port from environment variable (Render uses 10000)
+    port = int(os.environ.get('PORT', 10000))
     app.run(debug=False, host='0.0.0.0', port=port)

@@ -1,20 +1,37 @@
-# Use CUDA-enabled PyTorch base image
-FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+# Use a smaller base image for the build stage
+FROM python:3.10-slim as builder
 
-# Set working directory
-WORKDIR /app
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install system dependencies
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Production stage
+FROM python:3.10-slim
+
+# Install runtime dependencies only
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     libsndfile1 \
-    && rm -rf /var/lib/apt/lists/*
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Set working directory
+WORKDIR /app
 
 # Copy application code
 COPY . .

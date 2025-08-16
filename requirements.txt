@@ -15,5 +15,5 @@ flask>=2.0.0
 requests>=2.25.0
 werkzeug>=2.0.0
 
-# Production server
-gunicorn>=20.1.0
+# Hugging Face Spaces dependencies
+gradio>=3.50.0

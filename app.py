@@ -28,7 +28,8 @@ def health_check():
     return jsonify({
         "status": "healthy",
         "message": "Audio Analysis API is running",
-        "gpu_available": gpu_available
+        "gpu_available": gpu_available,
+        "platform": "Hugging Face Spaces"
     })
 
 @app.route('/speaking', methods=['POST'])
@@ -220,6 +221,7 @@ def index():
     return jsonify({
         "message": "Audio Analysis API",
         "version": "1.0.0",
+        "platform": "Hugging Face Spaces",
         "endpoints": {
             "GET /": "API documentation (this endpoint)",
             "GET /health": "Health check",
@@ -236,6 +238,6 @@ def index():
     })
 
 if __name__ == '__main__':
-    # Use port 8000 for production deployment
-    port = int(os.environ.get('PORT', 8000))
+    # Use port 7860 for Hugging Face Spaces
+    port = int(os.environ.get('PORT', 7860))
     app.run(debug=False, host='0.0.0.0', port=port)
